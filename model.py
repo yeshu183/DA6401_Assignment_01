@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import wandb
 class NN:
   def __init__(self,input_shape,output_shape,n_hidden_layers,h_per_layer,optimizer,activation_func="relu",loss_func="cross_entropy_loss",init_type="random",l2_reg=0):
     self.input_shape = input_shape
@@ -43,7 +44,7 @@ class NN:
       epsilon = 1e-10  # Prevent log(0)
       return -np.sum(y_true * np.log(y_hat + epsilon)) / y_hat.shape[0]
     elif self.loss_func == "squared_error":
-      return np.sum((y_hat-y_true)**2)
+      return np.sum((y_hat-y_true)**2)/y_hat.shape[0]
   def accuracy(self,y_hat,y_true):
     return np.sum(y_hat==y_true)/len(y_true)
   def weight_init(self, init_type="random"):
@@ -94,8 +95,8 @@ class NN:
     if self.loss_func == "cross_entropy_loss": #gradient wrt output layer
       a_grad = (y_hat - self.one_hot(y)).T
     elif self.loss_func == "squared_error":
-      a_grad = 2*(np.argmax(y_hat,axis=0) - y) #must be changed appropriately
-    a_grad_list[-1] = a_grad
+      a_grad = (2*(y_hat - self.one_hot(y))*y_hat*(1-y_hat)).T
+    a_grad_list[-1] = a_grad/y_hat.shape[0] 
     for k in range(self.n_h,-1,-1): # gradient wrt hiddden layers
       h_grad = np.dot(self.weights[k],a_grad_list[k+1])
       h_grad_list[k] = h_grad
@@ -105,7 +106,7 @@ class NN:
       self.grad_biases[k] = np.sum(a_grad_list[k+1],axis=1, keepdims=True)
   def predict(self,x):
     a_list,h_list = self.forward(x)
-    return np.argmax(h_list[self.n_h+1],axis=0)
+    return h_list[self.n_h+1]
   def train(self,x_train,y_train,x_val,y_val,epochs=10,batch_size=32):
     train_loss_list = []
     train_acc_list = []

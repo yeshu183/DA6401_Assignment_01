@@ -1,7 +1,7 @@
 import wandb
 import pickle
 import numpy as np
-from dataset import load_data
+from dataset import load_dataset
 from model import NN
 from optimizers import Optimizers
 from dataset import load_dataset
@@ -11,8 +11,8 @@ sweep_config = {
     'method': 'bayes',  # Options: grid, random, bayes
     'metric': {'name': 'final_val_acc', 'goal': 'maximize'},
     'parameters': {
-        'loss_func': {'values': ['cross_entropy_loss']},#, 'squared_error'
-        'epochs': {'values': [5,10]},
+        'loss_func': {'values': ['cross_entropy_loss','squared_error']},#, 'squared_error'
+        'epochs': {'values': [2,3]},
         'num_hid_layers': {'values': [3, 4, 5]},
         'hid_layer_size': {'values': [32,64,128]},
         'lr': {'values': [1e-3, 1e-4]},
@@ -23,7 +23,8 @@ sweep_config = {
         'optimizer_func': {'values': ['sgd','momentum', 'nesterov', 'rmsprop', 'adam']}
     }
 }
-x_train, y_train, x_val, y_val, x_test, y_test = load_data("fashion_mnist")
+x_train, y_train, x_val, y_val, x_test, y_test = load_dataset("fashion_mnist")
+best_val_acc = 0
 sweep_id = wandb.sweep(sweep_config, project="New Sweep")
 def train_sweep():
     global best_val_acc
@@ -64,4 +65,4 @@ def train_sweep():
         print("Best model updated!")
 
 
-wandb.agent(sweep_id, function=train_sweep, count=200)
+wandb.agent(sweep_id, function=train_sweep, count=5)

@@ -48,13 +48,14 @@ model = NN(
     optimizer=optimizer,
     l2_reg=args.weight_decay
 )
-
+print(x_train.shape)
 # Train Model
 train_loss, train_acc, val_loss, val_acc = model.train(x_train, y_train, x_val, y_val, args.epochs, args.batch_size)
 
 # Evaluate Model
 y_hat_test = model.predict(x_test)
-final_test_acc = model.accuracy(y_hat_test, y_test)
+y_pred_test = np.argmax(y_hat_test,axis=1)
+final_test_acc = model.accuracy(y_pred_test, y_test)
 final_test_loss = model.loss(y_hat_test, model.one_hot(y_test))
 
 # Log Metrics
