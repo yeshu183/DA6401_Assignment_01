@@ -17,7 +17,11 @@ This repository contains the implementation of a **fully connected neural networ
 ├── train.py              # Training script with command-line arguments
 └── README.md             # This file (Project Documentation)
 ```
-
+---
+**WandB Report Link:**
+```
+https://wandb.ai/yeshu183-indian-institute-of-technology-madras/DA6401_Assignment1/reports/DA6401-Assignment-1-Report-DA24M009--VmlldzoxMTYzMjcyNw?accessToken=kxgc7s5d9qg1m12w6qule1bb9yo8jccx713airn4yqm0km26aejgugef610dlnmq
+```
 ---
 
 ## 🛠 **Setup Instructions**
@@ -139,6 +143,13 @@ After running hyperparameter tuning, these were the **best-performing hyperparam
 | `num_layers` | `3` |
 | `activation` | `"relu"` |
 | `weight_init` | `"xavier"` |
+
+---
+**Test Accuracy on MNIST:**
+```
+Final Test Accuracy: 97.4%
+```
+---
 
 **Test Accuracy on Fashion-MNIST:**  
 ```
