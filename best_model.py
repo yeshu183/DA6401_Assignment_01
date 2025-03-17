@@ -6,6 +6,9 @@ from dataset import load_dataset
 from model import NN
 from config import DEFAULT_CONFIG
 from optimizers import Optimizers
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix
 import time
 # Connect to W&B
 api = wandb.Api()
@@ -35,9 +38,7 @@ print("Best model loaded successfully!")
 x_train, y_train, x_val, y_val, x_test, y_test = load_dataset("fashion_mnist")
 
 # Initialize W&B for testing
-wandb.init(project=project_name, entity=entity_name, force=True)
-wandb.run.name = "Best Model Evaluation"
-wandb.run.save()
+wandb.init(project="fashion-mnist", name="custom-confusion-matrix")
 
 # Run inference on the test set
 a_list_test, h_list_test = best_model.forward(x_test)
@@ -49,16 +50,27 @@ final_test_acc = best_model.accuracy(np.argmax(np.array(y_hat_test), axis=1), y_
 
 print(f"Test Loss: {final_test_loss:.4f}, Test Accuracy: {final_test_acc:.4f}")
 
-# Log results and confusion matrix
-wandb.log({
-    "test_loss": final_test_loss,
-    "test_acc": final_test_acc,
-    "confusion_matrix": wandb.plot.confusion_matrix(
-        probs=None,
-        y_true=y_test,
-        preds=np.argmax(np.array(y_hat_test), axis=1),
-        class_names=list(range(10))  # Change based on actual class names
-    )
-})
+class_labels = [
+    "T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
+    "Sandal", "Shirt", "Sneaker", "Bag", "Ankle_boot"
+]
 
+# Compute confusion matrix
+cm = confusion_matrix(y_test, np.argmax(np.array(y_hat_test),axis=1))
+mask = np.eye(len(cm), dtype=bool)
+cm_percentage = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
+
+# Plot confusion matrix
+plt.figure(figsize=(10, 8))
+sns.heatmap(cm_percentage, annot=True, fmt=".1f", cmap="Greens",mask=~mask,xticklabels=class_labels,yticklabels=class_labels,cbar=False)
+sns.heatmap(cm_percentage, annot=True, fmt=".1f", cmap="Reds",mask=mask,xticklabels=class_labels,yticklabels=class_labels,cbar=False)
+plt.xlabel("Predicted Label")
+plt.ylabel("True Label")
+plt.title("Custom Confusion Matrix")
+
+# Save the figure
+plt.savefig("confusion_matrix.png", bbox_inches="tight")
+wandb.log({"Custom Confusion Matrix": wandb.Image("confusion_matrix.png")})
+
+# Close wandb
 wandb.finish()
