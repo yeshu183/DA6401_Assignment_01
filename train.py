@@ -6,6 +6,7 @@ from dataset import load_dataset
 from model import NN
 from config import DEFAULT_CONFIG
 from optimizers import Optimizers
+import time
 
 # Argument Parser
 parser = argparse.ArgumentParser(description="Train a neural network on MNIST or Fashion-MNIST")

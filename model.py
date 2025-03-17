@@ -1,3 +1,5 @@
+import numpy as np
+import time
 class NN:
   def __init__(self,input_shape,output_shape,n_hidden_layers,h_per_layer,optimizer,activation_func="relu",loss_func="cross_entropy_loss",init_type="random",l2_reg=0):
     self.input_shape = input_shape
