@@ -1,16 +1,11 @@
-import wandb
-import numpy as np
-from optimizers import Optimizers
 class NN:
-  def __init__(self,input_shape,output_shape,n_hidden_layers,h_per_layer,activation_func="relu",loss_func="cross_entropy_loss",init_type="random",l2_reg=0,optimizer_func='adam',lr=1e-3):
+  def __init__(self,input_shape,output_shape,n_hidden_layers,h_per_layer,optimizer,activation_func="relu",loss_func="cross_entropy_loss",init_type="random",l2_reg=0):
     self.input_shape = input_shape
     self.output_shape = output_shape
     self.n_h = n_hidden_layers
     self.k = h_per_layer
     self.weights,self.biases = self.weight_init(init_type)
-    self.opt_name = optimizer_func
-    self.optimizer = Optimizers(lr=lr)  # Create an instance of Optimizers
-    self.optimizer_function = getattr(self.optimizer, optimizer_func)
+    self.optimizer_function = optimizer
     self.grad_weights = [0]*(self.n_h+1)
     self.grad_biases = [0]*(self.n_h+1)
     self.activation_func = activation_func
@@ -75,11 +70,7 @@ class NN:
     for i in range(len(self.weights)):
       grad_w = np.array(self.grad_weights[i])
       grad_b = np.array(self.grad_biases[i])
-      if self.opt_name == "sgd":
-          self.weights[i], self.biases[i] = self.optimizer_function(
-              self.weights[i], self.biases[i],grad_w,grad_b)
-      else:
-          self.weights[i], self.biases[i] = self.optimizer_function(
+      self.weights[i], self.biases[i] = self.optimizer_function.step(
               self.weights[i], self.biases[i],grad_w,grad_b,key=f"layer_{i}")
 
   def forward(self,x):
@@ -110,6 +101,9 @@ class NN:
       a_grad_list[k] = a_grad
       self.grad_weights[k] = np.dot(a_grad_list[k+1],h_list[k].T).T + + self.l2_reg * self.weights[k] #gradients wrt parameters
       self.grad_biases[k] = np.sum(a_grad_list[k+1],axis=1, keepdims=True)
+  def predict(self,x):
+    a_list,h_list = self.forward(x)
+    return np.argmax(h_list[self.n_h+1],axis=0)
   def train(self,x_train,y_train,x_val,y_val,epochs=10,batch_size=32):
     train_loss_list = []
     train_acc_list = []
@@ -119,10 +113,10 @@ class NN:
       start = time.time()
       indices = np.arange(len(x_train))
       np.random.shuffle(indices)
-      if self.opt_name == 'sgd':
-        batch_size=1
-      else:
-        batch_size = batch_size
+      # if self.opt_name == 'sgd':
+      #   batch_size=1
+      # else:
+      #   batch_size = batch_size
       per_epoch_loss = []
       per_epoch_acc = []
       for j in range(0,len(x_train),batch_size):
