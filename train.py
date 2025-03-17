@@ -35,7 +35,7 @@ wandb.init(project=args.wandb_project, entity=args.wandb_entity, config=vars(arg
 x_train, y_train, x_val, y_val, x_test, y_test = load_dataset(args.dataset)
 
 # Initialize Model
-optimizer = Optimizers(lr=args.learning_rate, beta1=args.beta1, beta2=args.beta2, rho=0.9, optimizer=args.optimizer)
+optimizer = Optimizers(lr=args.learning_rate, beta1=args.beta, beta2=args.beta2, rho=0.9, optimizer=args.optimizer)
 model = NN(
     input_shape=x_train.shape[1],
     output_shape=10,
