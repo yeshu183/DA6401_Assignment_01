@@ -2,7 +2,7 @@ import argparse
 import wandb
 import numpy as np
 import pickle
-from dataset import load_data
+from dataset import load_dataset
 from model import NN
 from config import DEFAULT_CONFIG
 
@@ -31,7 +31,7 @@ args = parser.parse_args()
 wandb.init(project=args.wandb_project, entity=args.wandb_entity, config=vars(args))
 
 # Load Data
-x_train, y_train, x_val, y_val, x_test, y_test = load_data(args.dataset)
+x_train, y_train, x_val, y_val, x_test, y_test = load_dataset(args.dataset)
 
 # Initialize Model
 model = NN(
