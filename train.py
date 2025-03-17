@@ -5,6 +5,7 @@ import pickle
 from dataset import load_dataset
 from model import NN
 from config import DEFAULT_CONFIG
+from optimizers import Optimizers
 
 # Argument Parser
 parser = argparse.ArgumentParser(description="Train a neural network on MNIST or Fashion-MNIST")
@@ -34,6 +35,7 @@ wandb.init(project=args.wandb_project, entity=args.wandb_entity, config=vars(arg
 x_train, y_train, x_val, y_val, x_test, y_test = load_dataset(args.dataset)
 
 # Initialize Model
+optimizer = Optimizers(lr=args.learning_rate, beta1=args.beta1, beta2=args.beta2, rho=0.9, optimizer=args.optimizer)
 model = NN(
     input_shape=x_train.shape[1],
     output_shape=10,
@@ -42,8 +44,7 @@ model = NN(
     activation_func=args.activation,
     init_type=args.weight_init,
     loss_func=args.loss,
-    optimizer_func=args.optimizer,
-    learning_rate=args.learning_rate,
+    optimizer=optimizer,
     l2_reg=args.weight_decay
 )
 
