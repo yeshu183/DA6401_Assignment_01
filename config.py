@@ -1,0 +1,16 @@
+DEFAULT_CONFIG = {
+    "epochs": 10,
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "num_layers": 3,
+    "hidden_size": 64,
+    "optimizer": "adam",
+    "loss": "cross_entropy",
+    "activation": "ReLU",
+    "momentum": 0.9,
+    "beta": 0.9,
+    "beta2": 0.999,
+    "epsilon": 1e-8,
+    "weight_decay": 0.0,
+    "weight_init": "Xavier",
+}
